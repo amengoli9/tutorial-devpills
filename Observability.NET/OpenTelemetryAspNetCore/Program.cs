@@ -4,9 +4,12 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using OpenTelemetryAspNetCore.Application;
+using OpenTelemetryAspNetCore.Domain.Ports;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
 
 var serviceName = builder.Configuration["ServiceName"] ?? "MyService";
 var serviceVersion = builder.Configuration["ServiceVersion"] ?? "1.0.0"; // only for demo purposes
@@ -29,27 +32,12 @@ builder.Services.AddOpenTelemetry()
       .AddOtlpExporter());
 
 
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
-app.MapGet("/example/{exampleString?}", DemoLogic);
+
+app.MapOrderEndpoints();
 app.Run();
 
 
-
-bool DemoLogic([FromServices] ILogger<Program> logger, string? exampleString)
-{
-   bool result = true;
-   if (string.IsNullOrEmpty(exampleString))
-   {
-      logger.LogWarning("ExampleString is missing!");
-      result = false;
-   }
-   else
-   {
-      logger.LogInformation("Called by {ExampleString}", exampleString);
-   }
-
-   return result;
-}
