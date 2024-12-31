@@ -10,6 +10,10 @@ public class OrderService(ILogger<OrderService> logger) : IOrderService
 
     public Task<IEnumerable<Order>> GetAllAsync()
     {
+        using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("OrderService.GetAllAsync");
+         //activity.Start();
+         activity?.SetTag("orders.count", _orders.Count);
+
         logger.LogInformation("Getting all orders");
         return Task.FromResult(_orders.AsEnumerable());
     }
