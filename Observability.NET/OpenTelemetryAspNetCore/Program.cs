@@ -11,12 +11,17 @@ using System.Globalization;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 
-var serviceName = builder.Configuration["ServiceName"] ?? "MyService";
+var serviceName = builder.Configuration["ServiceName"] ?? "OpenTelemetryAspNetCore";
 var serviceVersion = builder.Configuration["ServiceVersion"] ?? "1.0.0"; // only for demo purposes
 
 builder.Services.AddOpenTelemetry()
-   .ConfigureResource(resource => resource
-        .AddService(serviceName, serviceVersion))
+   .ConfigureResource(resource => resource.AddService(serviceName, serviceVersion)
+        .AddAttributes(new Dictionary<string, object>
+        {
+           ["deployment.environment"] = builder.Environment.EnvironmentName,
+           ["host.name"] = Environment.MachineName,
+           ["service.instance.id"] = Guid.NewGuid().ToString()
+        }))
    .WithTracing(trace => trace
       .AddAspNetCoreInstrumentation()
       .AddConsoleExporter()
