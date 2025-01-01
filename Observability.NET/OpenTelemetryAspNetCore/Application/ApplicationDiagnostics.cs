@@ -5,10 +5,10 @@ namespace OpenTelemetryAspNetCore.Application;
 public static class ApplicationDiagnostics
 {
    
-   private static readonly string ServiceName = "OpenTelemetryAspNetCore";
+   public static readonly string OrdersSourceName = "Orders.Processing";
    private static readonly string ServiceVersion = "1.0.0";
 
-   public static readonly ActivitySource ActivitySource = new(ServiceName, ServiceVersion);
+   public static readonly ActivitySource ActivitySource = new(OrdersSourceName, ServiceVersion);
 
 
 

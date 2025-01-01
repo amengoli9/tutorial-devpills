@@ -23,7 +23,7 @@ builder.Services.AddOpenTelemetry()
            ["service.instance.id"] = Guid.NewGuid().ToString()
         }))
    .WithTracing(trace => trace
-      .AddSource(serviceName)
+      .AddSource(ApplicationDiagnostics.OrdersSourceName)
       .AddAspNetCoreInstrumentation()
       .AddConsoleExporter()
       .AddOtlpExporter())
