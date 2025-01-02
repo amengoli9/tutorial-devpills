@@ -1,19 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry.Exporter;
+
+
+
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using OpenTelemetryAspNetCore.Application;
-using OpenTelemetryAspNetCore.Domain.Ports;
-using OpenTelemetryAspNetCore.Infrastructure.Adapters;
-using System.Globalization;
 
-var builder = WebApplication.CreateBuilder(args); 
-builder.Services.AddSwaggerGen();
-builder.Services.AddEndpointsApiExplorer();
+var builder = WebApplication.CreateBuilder(args);
 
-var serviceName = builder.Configuration["ServiceName"] ?? "OpenTelemetryAspNetCore";
+// Add services to the container.
+var serviceName = builder.Configuration["ServiceName"] ?? "PriceExample";
 var serviceVersion = builder.Configuration["ServiceVersion"] ?? "1.0.0"; // only for demo purposes
 
 builder.Services.AddOpenTelemetry()
@@ -25,9 +21,8 @@ builder.Services.AddOpenTelemetry()
            ["service.instance.id"] = Guid.NewGuid().ToString()
         }))
    .WithTracing(trace => trace
-      .AddSource(ApplicationDiagnostics.OrdersSourceName)
       .AddAspNetCoreInstrumentation()
-      //.AddHttpClientInstrumentation()
+      .AddHttpClientInstrumentation()
       .AddConsoleExporter()
       .AddOtlpExporter()
       .AddOtlpExporter(c => c.Endpoint = new Uri("http://localhost:4318")))
@@ -40,16 +35,14 @@ builder.Services.AddOpenTelemetry()
    .WithLogging(logger => logger
       .AddConsoleExporter()
       .AddOtlpExporter());
-
-
-builder.Services.AddHttpClient(); 
-builder.Services.AddScoped<IPriceGateway, PriceGateway>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
-app.MapOrderEndpoints();
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
    app.UseSwagger();
@@ -57,6 +50,9 @@ if (app.Environment.IsDevelopment())
 }
 
 
+app.UseAuthorization();
+
+
+app.MapControllers();
+
 app.Run();
-
-
