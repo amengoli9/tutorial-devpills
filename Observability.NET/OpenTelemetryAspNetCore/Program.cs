@@ -26,8 +26,11 @@ builder.Services.AddOpenTelemetry()
         }))
    .WithTracing(trace => trace
       .AddSource(ApplicationDiagnostics.OrdersSourceName)
-      .AddAspNetCoreInstrumentation()
-      //.AddHttpClientInstrumentation()
+       .AddAspNetCoreInstrumentation(options =>
+       {
+          options.Filter = context => !context.Request.Path.Equals("/health");
+       })
+      .AddHttpClientInstrumentation()
       .AddConsoleExporter()
       .AddOtlpExporter()
       .AddOtlpExporter(c => c.Endpoint = new Uri("http://localhost:4318")))
@@ -41,6 +44,7 @@ builder.Services.AddOpenTelemetry()
       .AddConsoleExporter()
       .AddOtlpExporter());
 
+builder.Services.AddHealthChecks();
 
 builder.Services.AddHttpClient(); 
 builder.Services.AddScoped<IPriceGateway, PriceGateway>();
@@ -48,6 +52,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 
+app.MapHealthChecks("/health");
 
 app.MapOrderEndpoints();
 if (app.Environment.IsDevelopment())
