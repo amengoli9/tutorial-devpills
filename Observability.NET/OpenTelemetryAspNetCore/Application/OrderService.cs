@@ -14,14 +14,14 @@ public class OrderService(ILogger<OrderService> logger, IPriceGateway priceGatew
 
    public async Task<IEnumerable<Order>> GetAllAsync()
    {
+      logger.LogInformation("Getting all orders");
+
       using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("OrderService.GetAllAsync");
       activity?.SetTag("orders.count", _orders.Count);
-      logger.LogInformation("Getting all orders");
       Price price = new Price();
       try
       {
          price = await priceGateway.GetPriceAsync(1);
-         var a = price;
       }
       catch (Exception ex)
       {
@@ -32,41 +32,48 @@ public class OrderService(ILogger<OrderService> logger, IPriceGateway priceGatew
       _orders.ForEach(async o =>
       {
          o.Price = price;
-         
+
 
       });
 
       return _orders;
    }
 
-   public Task<Order?> GetByIdAsync(int id) =>
-       Task.FromResult(_orders.FirstOrDefault(o => o.Id == id));
+   public async Task<Order?> GetByIdAsync(int id)
+   {
 
-   public Task<Order> CreateAsync(Order order)
+      logger.LogInformation("Get order with {Id}", id);
+      return _orders.FirstOrDefault(o => o.Id == id);
+
+   }
+
+
+   public async Task<Order> CreateAsync(Order order)
    {
       order.Id = _orders.Count + 1;
       order.OrderDate = DateTime.UtcNow;
       _orders.Add(order);
       logger.LogInformation("Order {OrderId} created", order.Id);
-      return Task.FromResult(order);
+      return order;
    }
 
-   public Task<Order?> UpdateAsync(int id, Order order)
+   public async Task<Order?> UpdateAsync(int id, Order order)
    {
       var index = _orders.FindIndex(o => o.Id == id);
-      if (index == -1) return Task.FromResult<Order?>(null);
+      if (index == -1) return default;
 
       order.Id = id;
       _orders[index] = order;
-      return Task.FromResult<Order?>(order);
+      return order;
    }
 
-   public Task<bool> DeleteAsync(int id)
+   public async Task<bool> DeleteAsync(int id)
    {
       var index = _orders.FindIndex(o => o.Id == id);
-      if (index == -1) return Task.FromResult(false);
+      if (index == -1) return false;
 
       _orders.RemoveAt(index);
-      return Task.FromResult(true);
+      return true;
    }
+
 }
