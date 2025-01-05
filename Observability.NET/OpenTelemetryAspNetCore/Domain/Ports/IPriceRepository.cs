@@ -2,7 +2,7 @@
 
 namespace OpenTelemetryAspNetCore.Domain.Ports;
 
-public interface IPriceGateway
+public interface IPriceRepository
 {
-   public Task<Price> GetPriceAsync(int id);
+   public Task<Amount> GetPriceAsync(int id);
 }

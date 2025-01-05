@@ -1,13 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
+using OpenTelemetry.Trace;
+using OpenTelemetryAspNetCore.Application;
 using OpenTelemetryAspNetCore.Domain.Models;
 using OpenTelemetryAspNetCore.Domain.Ports;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace OpenTelemetryAspNetCore.Infrastructure.Adapters;
 
-public class PriceGateway(ILogger<PriceGateway> logger, HttpClient httpClient) : IPriceGateway
+public class PriceRepository(ILogger<PriceRepository> logger, HttpClient httpClient) : IPriceRepository
 {
 
    private static readonly JsonSerializerOptions _jsonOptions = new()
@@ -16,7 +19,7 @@ public class PriceGateway(ILogger<PriceGateway> logger, HttpClient httpClient) :
       NumberHandling = JsonNumberHandling.AllowReadingFromString
    };
 
-   public async Task<Price> GetPriceAsync(int id)
+   public async Task<Amount> GetPriceAsync(int id)
    {
       try
       {
@@ -26,22 +29,13 @@ public class PriceGateway(ILogger<PriceGateway> logger, HttpClient httpClient) :
          response.EnsureSuccessStatusCode();
 
          string jsonResponse = await response.Content.ReadAsStringAsync();
-         return JsonSerializer.Deserialize<Price>(jsonResponse, _jsonOptions);
-      }
-      catch (HttpRequestException ex)
-      {
-         // Gestione errori di rete o HTTP
-         throw new Exception($"Errore durante la chiamata API: {ex.Message}");
-      }
-      catch (JsonException ex)
-      {
-         // Gestione errori di deserializzazione
-         throw new Exception($"Errore nella deserializzazione della risposta: {ex.Message}");
+         return JsonSerializer.Deserialize<Amount>(jsonResponse, _jsonOptions);
       }
       catch (Exception ex)
       {
-         // Gestione errori di deserializzazione
          logger.LogError(ex.Message, ex);
+         Activity.Current?.SetStatus(ActivityStatusCode.Error, ex.Message);
+         Activity.Current?.AddException(ex);
          throw new Exception($"Errore nella deserializzazione della risposta: {ex.Message}");
       }
 

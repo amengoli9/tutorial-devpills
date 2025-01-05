@@ -6,10 +6,10 @@ using System.Diagnostics;
 namespace OpenTelemetryAspNetCore.Application;
 
 
-public class OrderService(ILogger<OrderService> logger, IPriceGateway priceGateway) : IOrderService
+public class OrderService(ILogger<OrderService> logger, IPriceRepository priceGateway) : IOrderService
 {
    private readonly List<Order> _orders = new List<Order> {
-      new Order { Id = 1, TotalAmount = 100 },
+      new Order { Id = 1, OrderDate = DateTime.UtcNow },
    };
 
    public async Task<IEnumerable<Order>> GetAllAsync()
@@ -18,7 +18,7 @@ public class OrderService(ILogger<OrderService> logger, IPriceGateway priceGatew
 
       using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("OrderService.GetAllAsync");
       activity?.SetTag("orders.count", _orders.Count);
-      Price price = new Price();
+      Amount price = new Amount();
       try
       {
          price = await priceGateway.GetPriceAsync(1);
@@ -27,11 +27,11 @@ public class OrderService(ILogger<OrderService> logger, IPriceGateway priceGatew
       {
          logger.LogError(ex.Message, ex);
          Activity.Current?.SetStatus(ActivityStatusCode.Error, ex.Message);
-         Activity.Current?.RecordException(ex);
+         Activity.Current?.AddException(ex);
       }
       _orders.ForEach(async o =>
       {
-         o.Price = price;
+         o.Amount = price;
 
 
       });
@@ -54,6 +54,8 @@ public class OrderService(ILogger<OrderService> logger, IPriceGateway priceGatew
       order.OrderDate = DateTime.UtcNow;
       _orders.Add(order);
       logger.LogInformation("Order {OrderId} created", order.Id);
+      Activity.Current?.SetTag("order.date", order.OrderDate);
+      Activity.Current?.AddEvent(new ActivityEvent("Order created", tags: new ActivityTagsCollection { { "orderId", order.Id } }));
       return order;
    }
 
