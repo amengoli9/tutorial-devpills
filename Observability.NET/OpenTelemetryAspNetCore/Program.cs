@@ -19,7 +19,7 @@ builder.Services.AddOpenTelemetry()
         .AddAttributes(new Dictionary<string, object>
         {
            ["deployment.environment"] = builder.Environment.EnvironmentName,
-           ["host.name"] = Environment.MachineName,
+           ["host.name"] = Environment.MachineName, 
            ["service.instance.id"] = Guid.NewGuid().ToString()
         }))
    .WithTracing(trace => trace
@@ -62,7 +62,6 @@ builder.Logging.AddOpenTelemetry(opt =>
    opt.AddOtlpExporter();
    opt.AddOtlpExporter(c => c.Endpoint = new Uri("http://localhost:4318"));
    opt.AddOtlpExporter(c => { c.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/logs"); c.Protocol = OtlpExportProtocol.HttpProtobuf; });
-
    opt.AddConsoleExporter();
 }
 );
