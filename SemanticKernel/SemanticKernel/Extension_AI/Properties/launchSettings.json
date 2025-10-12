@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Extension_AI": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

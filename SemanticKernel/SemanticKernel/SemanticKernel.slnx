@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Extension_AI/Extension_AI.csproj" Id="82551359-c885-47d7-abb4-0dee54c8db90" />
   <Project Path="SemanticKernel_Console/SemanticKernel_Console.csproj" />
 </Solution>
