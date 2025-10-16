@@ -24,13 +24,13 @@ handler.CheckCertificateRevocationList = false;
 var client = new HttpClient(handler);
 
 var builder = Kernel.CreateBuilder();
+HttpClient clientk = new HttpClient(new MyHttpMessageHandler());
 
-builder.AddOllamaChatCompletion(modelId, new Uri(endpoint));
+//builder.AddOllamaChatCompletion(modelId, new Uri(endpoint));
 
-
+builder.AddOpenAIChatCompletion("fake-model-name", "fake-api-key", httpClient: clientk);
 builder.Plugins
     .AddFromType<MyTimePlugin>();
-
 
 
 
@@ -109,7 +109,7 @@ IChatClient client2 = new ChatClientBuilder(ollamaClient)
         configure: c => c.EnableSensitiveData = true)
     .Build();
 
-Console.WriteLine((await client2.GetResponseAsync("What is AI?")).Text);
+//Console.WriteLine((await client2.GetResponseAsync("What time is it?")).Text);
 
 var messageCount = 0;
 

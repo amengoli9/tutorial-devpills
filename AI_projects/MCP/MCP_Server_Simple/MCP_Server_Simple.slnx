@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../MCP_Server_Simple_HTTP/MCP_Server_Simple_HTTP.csproj" />
+  <Project Path="MCP_Server_Simple.csproj" />
+</Solution>
