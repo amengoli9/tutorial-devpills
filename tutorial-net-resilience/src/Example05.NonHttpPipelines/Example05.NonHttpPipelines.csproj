@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Resilience.Shared/Resilience.Shared.csproj" />
+    <!-- Non-HTTP pipelines only need Microsoft.Extensions.Resilience (Polly.Core/Extensions/RateLimiting come with it). -->
+    <PackageReference Include="Microsoft.Extensions.Resilience" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

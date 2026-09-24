@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FlakyApi/FlakyApi.csproj" />
+    <Project Path="src/Resilience.Shared/Resilience.Shared.csproj" />
+    <Project Path="src/Example01.StandardHandler/Example01.StandardHandler.csproj" />
+    <Project Path="src/Example02.CustomPipeline/Example02.CustomPipeline.csproj" />
+    <Project Path="src/Example03.Hedging/Example03.Hedging.csproj" />
+    <Project Path="src/Example04.DynamicReload/Example04.DynamicReload.csproj" />
+    <Project Path="src/Example05.NonHttpPipelines/Example05.NonHttpPipelines.csproj" />
+    <Project Path="src/Example06.Chaos/Example06.Chaos.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Resilience.Tests/Resilience.Tests.csproj" />
+  </Folder>
+</Solution>
